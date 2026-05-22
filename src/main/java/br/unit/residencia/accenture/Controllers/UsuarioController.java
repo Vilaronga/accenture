@@ -1,6 +1,5 @@
 package br.unit.residencia.accenture.Controllers;
 
-import br.unit.residencia.accenture.Config.UsuarioLogado;
 import br.unit.residencia.accenture.Models.Usuario;
 import br.unit.residencia.accenture.Repositorys.UsuarioRepository;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,9 +16,6 @@ public class UsuarioController {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
-
-    @Autowired
-    private UsuarioLogado usuarioLogado;
 
     @Operation(summary = "Página inicial pública")
     @GetMapping("/")
