@@ -2,7 +2,7 @@ package br.unit.residencia.accenture.Services;
 
 import br.unit.residencia.accenture.Models.Perfil;
 import br.unit.residencia.accenture.Models.Usuario;
-import br.unit.residencia.accenture.Repositorys.UsuarioRepository;
+import br.unit.residencia.accenture.Repositories.UsuarioRepository;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
@@ -27,7 +27,7 @@ public class OidcUsuarioService extends OidcUserService {
         String email = oidcUser.getEmail();
         String nome = oidcUser.getFullName();
         String microsoftId = oidcUser.getSubject();
-        Perfil perfilPadrao = Perfil.Colaborador;
+        Perfil perfilPadrao = Perfil.COLABORADOR;
         LocalDate data = LocalDate.now();
 
         System.out.println("=== Dados do OIDC User ===");

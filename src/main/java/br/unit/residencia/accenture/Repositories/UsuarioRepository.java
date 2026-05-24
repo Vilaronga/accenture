@@ -1,4 +1,4 @@
-package br.unit.residencia.accenture.Repositorys;
+package br.unit.residencia.accenture.Repositories;
 
 import br.unit.residencia.accenture.Models.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;

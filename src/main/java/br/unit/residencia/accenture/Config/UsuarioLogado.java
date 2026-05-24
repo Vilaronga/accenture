@@ -1,7 +1,7 @@
 package br.unit.residencia.accenture.Config;
 
 import br.unit.residencia.accenture.Models.Usuario;
-import br.unit.residencia.accenture.Repositorys.UsuarioRepository;
+import br.unit.residencia.accenture.Repositories.UsuarioRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Component;
