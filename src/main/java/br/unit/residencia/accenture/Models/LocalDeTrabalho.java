@@ -27,6 +27,4 @@ public class LocalDeTrabalho {
 
     private Double posX;
     private Double posY;
-
-    private boolean disponivel;
 }

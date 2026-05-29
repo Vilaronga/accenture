@@ -57,7 +57,6 @@ public class PersistenciaPlantaService {
                             .tipoCadeira(dto.type().equals("CADEIRA_PC") ? TipoCadeira.PC : TipoCadeira.GERAL)
                             .posX(dto.x())
                             .posY(dto.y())
-                            .disponivel(true)
                             .build();
                     sala.adicionarLocal(local);
                 }

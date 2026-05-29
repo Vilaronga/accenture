@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "usuarios")
@@ -34,4 +36,12 @@ public class Usuario {
 
     @Column(name="data_atualizacao")
     private LocalDate dataAtualizacao;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "usuario")
+    private List<Reserva> reservas = new ArrayList<>();
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "especialidade")
+    private Especialidade especialidade;
 }

@@ -34,6 +34,11 @@ public class Sala {
     @OneToMany(mappedBy = "sala", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LocalDeTrabalho> locaisDeTrabalho = new ArrayList<>();
 
+    @Builder.Default
+    @OneToMany(mappedBy = "sala", cascade = CascadeType.ALL, orphanRemoval = true
+    )
+    private List<Reserva> reservas = new ArrayList<>();
+
     //Métodos adicionais
     public void adicionarRecurso(Recurso recurso) {
         recursos.add(recurso);
