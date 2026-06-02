@@ -46,5 +46,4 @@ public class Reserva {
 
     @Column(name = "data_hora_criacao")
     private LocalDateTime dataHoraCriacao;
-
 }

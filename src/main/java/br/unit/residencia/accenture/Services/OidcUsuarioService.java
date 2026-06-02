@@ -1,5 +1,6 @@
 package br.unit.residencia.accenture.Services;
 
+import br.unit.residencia.accenture.Models.Especialidade;
 import br.unit.residencia.accenture.Models.Perfil;
 import br.unit.residencia.accenture.Models.Usuario;
 import br.unit.residencia.accenture.Repositories.UsuarioRepository;
@@ -10,6 +11,7 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Random;
 
 @Service
 public class OidcUsuarioService extends OidcUserService {
@@ -28,6 +30,7 @@ public class OidcUsuarioService extends OidcUserService {
         String nome = oidcUser.getFullName();
         String microsoftId = oidcUser.getSubject();
         Perfil perfilPadrao = Perfil.COLABORADOR;
+        Especialidade especialidade = Especialidade.BACKEND;
         LocalDate data = LocalDate.now();
 
         System.out.println("=== Dados do OIDC User ===");
@@ -35,6 +38,7 @@ public class OidcUsuarioService extends OidcUserService {
         System.out.println("nome: " + nome);
         System.out.println("microsoftID:" + microsoftId);
         System.out.println(("perfil: " + perfilPadrao));
+        System.out.println(("especialidade: " + especialidade));
         System.out.println(("data: " + data));
 
         usuarioRepository.findByEmail(email)
@@ -45,6 +49,7 @@ public class OidcUsuarioService extends OidcUserService {
                                 .microsoftId(microsoftId)
                                 .perfil(perfilPadrao)
                                 .dataCriacao(data)
+                                .especialidade(especialidade)
                                 .dataAtualizacao(data)
                                 .build()
                 ));

@@ -46,23 +46,17 @@ public class AnalisePlantaBaixaService {
             MultipartFile multipartFile
     ) throws Exception {
 
-        File tempFile =
-                createTempFile(multipartFile);
+        File tempFile = createTempFile(multipartFile);
 
-        Mat originalImage = imread(
-                tempFile.getAbsolutePath()
-        );
+        Mat originalImage = imread(tempFile.getAbsolutePath());
 
         validateImage(originalImage);
 
-        Mat processedImage =
-                preprocessImage(originalImage);
+        Mat processedImage = preprocessImage(originalImage);
 
-        List<ObjetoDetectadoDTO> objects =
-                new ArrayList<>();
+        List<ObjetoDetectadoDTO> objects = new ArrayList<>();
 
         // Detecções encontradas
-
         detectTemplatesFromFolder(
                 objects,
                 processedImage,
@@ -107,51 +101,22 @@ public class AnalisePlantaBaixaService {
 
         printSummary(objects);
 
-        return new ResultadoDeteccaoDTO(
-                objects
-        );
+        return new ResultadoDeteccaoDTO(objects);
     }
 
     // Resumo de tudo encontrado
-
-    private void printSummary(
-            List<ObjetoDetectadoDTO> objects
-    ) {
+    private void printSummary(List<ObjetoDetectadoDTO> objects) {
 
         long cadeirasGerais =
-                objects.stream()
-                        .filter(o ->
-                                o.type()
-                                        .equals("CADEIRA_GERAL"))
-                        .count();
+                objects.stream().filter(o -> o.type().equals("CADEIRA_GERAL")).count();
 
-        long cadeirasPc =
-                objects.stream()
-                        .filter(o ->
-                                o.type()
-                                        .equals("CADEIRA_PC"))
-                        .count();
+        long cadeirasPc = objects.stream().filter(o -> o.type().equals("CADEIRA_PC")).count();
 
-        long tvs =
-                objects.stream()
-                        .filter(o ->
-                                o.type()
-                                        .equals("TV"))
-                        .count();
+        long tvs = objects.stream().filter(o -> o.type().equals("TV")).count();
 
-        long impressoras =
-                objects.stream()
-                        .filter(o ->
-                                o.type()
-                                        .equals("IMPRESSORA"))
-                        .count();
+        long impressoras = objects.stream().filter(o -> o.type().equals("IMPRESSORA")).count();
 
-        long paineis =
-                objects.stream()
-                        .filter(o ->
-                                o.type()
-                                        .equals("PAINELLED"))
-                        .count();
+        long paineis = objects.stream().filter(o -> o.type().equals("PAINELLED")).count();
 
         System.out.println("\n========== RESUMO ==========");
         System.out.println("CADEIRA_GERAL: " + cadeirasGerais);
@@ -164,10 +129,7 @@ public class AnalisePlantaBaixaService {
     }
 
     // Planta salva temporariamente
-
-    private File createTempFile(
-            MultipartFile multipartFile
-    ) throws Exception {
+    private File createTempFile(MultipartFile multipartFile) throws Exception {
 
         File tempFile =
                 File.createTempFile(
@@ -181,10 +143,7 @@ public class AnalisePlantaBaixaService {
     }
 
     // Validação da imagem
-
-    private void validateImage(
-            Mat image
-    ) {
+    private void validateImage(Mat image) {
 
         if (image.empty()) {
 
@@ -195,134 +154,68 @@ public class AnalisePlantaBaixaService {
     }
 
     // Pré-processamento da imagem
+    private Mat preprocessImage(Mat image) {
 
-    private Mat preprocessImage(
-            Mat image
-    ) {
+        Mat gray = new Mat();
 
-        Mat gray =
-                new Mat();
+        cvtColor(image, gray, COLOR_BGR2GRAY);
 
-        cvtColor(
-                image,
-                gray,
-                COLOR_BGR2GRAY
-        );
+        GaussianBlur(gray, gray, new Size(3, 3), 0);
 
-        GaussianBlur(
-                gray,
-                gray,
-                new Size(3, 3),
-                0
-        );
-
-        Canny(
-                gray,
-                gray,
-                50,
-                150
-        );
+        Canny(gray, gray, 50, 150);
 
         return gray;
     }
 
     // Verifica os templates das pastas
 
-    private void detectTemplatesFromFolder(
-            List<ObjetoDetectadoDTO> objects,
-            Mat image,
-            String folderPath,
-            String type
-    ) {
+    private void detectTemplatesFromFolder(List<ObjetoDetectadoDTO> objects, Mat image, String folderPath, String type) {
 
-        File folder =
-                new File(folderPath);
+        File folder = new File(folderPath);
 
-        File[] files =
-                folder.listFiles();
+        File[] files = folder.listFiles();
 
         if (files == null) {
 
-            System.out.println(
-                    "Pasta não encontrada: "
-                            + folderPath
-            );
+            System.out.println("Pasta não encontrada: " + folderPath);
 
             return;
         }
 
         for (File file : files) {
 
-            String fileName =
-                    file.getName()
-                            .toLowerCase();
+            String fileName = file.getName().toLowerCase();
 
-            if (
-                    !fileName.endsWith(".png")
-                            &&
-                            !fileName.endsWith(".jpg")
-                            &&
-                            !fileName.endsWith(".jpeg")
-            ) {
+            if (!fileName.endsWith(".png") && !fileName.endsWith(".jpg") && !fileName.endsWith(".jpeg")) {
                 continue;
             }
 
-            System.out.println(
-                    "Analisando template: "
-                            + file.getName()
-            );
+            System.out.println("Analisando template: " + file.getName());
 
-            detectTemplate(
-                    objects,
-                    image,
-                    file.getAbsolutePath(),
-                    type
-            );
+            detectTemplate(objects, image, file.getAbsolutePath(), type);
         }
     }
 
     // Compara os templates com a imagem
+    private void detectTemplate(List<ObjetoDetectadoDTO> detected, Mat image, String templatePath, String type) {
 
-    private void detectTemplate(
-            List<ObjetoDetectadoDTO> detected,
-            Mat image,
-            String templatePath,
-            String type
-    ) {
-
-        Mat template = imread(
-                templatePath,
-                IMREAD_GRAYSCALE
-        );
+        Mat template = imread(templatePath, IMREAD_GRAYSCALE);
 
         if (template.empty()) {
-
-            System.out.println(
-                    "Template inválido: "
-                            + templatePath
-            );
-
+            System.out.println("Template inválido: " + templatePath);
             return;
         }
 
         // Canny no template
-
-        Canny(
-                template,
-                template,
-                50,
-                150
-        );
+        Canny(template, template, 50, 150);
 
         // Escalas para verificação
 
-        double[] scales =
-                getScalesByType(type);
+        double[] scales = getScalesByType(type);
 
         for (double scale : scales) {
 
-            Mat resizedTemplate =
-                    new Mat();
+            Mat resizedTemplate = new Mat();
 
             resize(
                     template,
@@ -333,18 +226,11 @@ public class AnalisePlantaBaixaService {
                     INTER_LINEAR
             );
 
-            if (
-                    resizedTemplate.cols()
-                            >= image.cols()
-                            ||
-                            resizedTemplate.rows()
-                                    >= image.rows()
-            ) {
+            if (resizedTemplate.cols() >= image.cols() || resizedTemplate.rows() >= image.rows()) {
                 continue;
             }
 
-            Mat result =
-                    new Mat();
+            Mat result = new Mat();
 
             matchTemplate(
                     image,
@@ -355,44 +241,26 @@ public class AnalisePlantaBaixaService {
 
             while (true) {
 
-                MatchResult matchResult =
-                        getBestMatch(result);
+                MatchResult matchResult = getBestMatch(result);
 
-                double confidence =
-                        matchResult.confidence();
+                double confidence = matchResult.confidence();
 
-                double threshold =
-                        getThresholdByType(type);
+                double threshold = getThresholdByType(type);
 
                 if (confidence < threshold) {
                     break;
                 }
 
-                Point point =
-                        matchResult.point();
+                Point point = matchResult.point();
 
                 // Tenta evitar pixels duplos
-
-                if (
-                        alreadyDetected(
-                                detected,
-                                point
-                        )
-                ) {
-
-                    removeDetectedArea(
-                            result,
-                            point,
-                            resizedTemplate
-                    );
-
+                if (alreadyDetected(detected, point)) {
+                    removeDetectedArea(result, point, resizedTemplate);
                     continue;
                 }
 
                 // detecção de objetos
-
-                detected.add(
-                        new ObjetoDetectadoDTO(
+                detected.add(new ObjetoDetectadoDTO(
                                 type,
                                 (double) point.x(),
                                 (double) point.y(),
@@ -415,7 +283,6 @@ public class AnalisePlantaBaixaService {
                 );
 
                 // debug visual
-
                 rectangle(
                         image,
                         new Rect(
@@ -436,7 +303,6 @@ public class AnalisePlantaBaixaService {
                 );
 
                 // remove comparação
-
                 removeDetectedArea(
                         result,
                         point,
@@ -447,10 +313,7 @@ public class AnalisePlantaBaixaService {
     }
 
     // threshold estabelecido em cada tipo
-
-    private double getThresholdByType(
-            String type
-    ) {
+    private double getThresholdByType(String type) {
 
         return switch (type) {
 
@@ -472,10 +335,7 @@ public class AnalisePlantaBaixaService {
     }
 
     // Escalas pra cada tipo
-
-    private double[] getScalesByType(
-            String type
-    ) {
+    private double[] getScalesByType(String type) {
 
         return switch (type) {
 
@@ -506,22 +366,15 @@ public class AnalisePlantaBaixaService {
     }
 
     // Escola da melhor comparação
+    private MatchResult getBestMatch(Mat result) {
 
-    private MatchResult getBestMatch(
-            Mat result
-    ) {
+        DoublePointer minVal = new DoublePointer(1);
 
-        DoublePointer minVal =
-                new DoublePointer(1);
+        DoublePointer maxVal = new DoublePointer(1);
 
-        DoublePointer maxVal =
-                new DoublePointer(1);
+        Point minLoc = new Point();
 
-        Point minLoc =
-                new Point();
-
-        Point maxLoc =
-                new Point();
+        Point maxLoc = new Point();
 
         minMaxLoc(
                 result,
@@ -539,16 +392,9 @@ public class AnalisePlantaBaixaService {
     }
 
     // Tenta evitar se já foi detectado
+    private boolean alreadyDetected(List<ObjetoDetectadoDTO> detected, Point point) {
 
-    private boolean alreadyDetected(
-            List<ObjetoDetectadoDTO> detected,
-            Point point
-    ) {
-
-        for (
-                ObjetoDetectadoDTO obj
-                : detected
-        ) {
+        for (ObjetoDetectadoDTO obj : detected) {
 
             double distance =
                     Math.sqrt(
@@ -580,12 +426,7 @@ public class AnalisePlantaBaixaService {
     }
 
     // Remover comparação
-
-    private void removeDetectedArea(
-            Mat result,
-            Point point,
-            Mat template
-    ) {
+    private void removeDetectedArea(Mat result, Point point, Mat template) {
 
         rectangle(
                 result,
@@ -603,7 +444,6 @@ public class AnalisePlantaBaixaService {
     }
 
     // Record auxiliar
-
     private record MatchResult(
             double confidence,
             Point point

@@ -4,5 +4,6 @@ public enum Especialidade {
     BACKEND,
     FRONTEND,
     DEVOPS,
+    DESIGNER,
     UI_UX
 }

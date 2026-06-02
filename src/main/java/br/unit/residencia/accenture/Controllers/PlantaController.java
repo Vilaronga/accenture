@@ -17,9 +17,7 @@ public class PlantaController {
     }
 
     @PostMapping(value = "/processar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> processarPlanta(
-            @RequestParam("nomeSala") String nomeSala,
-            @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<String> processarPlanta(@RequestParam("nomeSala") String nomeSala, @RequestParam("file") MultipartFile file) {
         try {
             persistenciaService.processarESalvar(nomeSala, file);
             return ResponseEntity.ok("Planta '" + nomeSala + "' processada e salva com sucesso.");

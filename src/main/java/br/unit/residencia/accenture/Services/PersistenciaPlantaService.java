@@ -37,9 +37,10 @@ public class PersistenciaPlantaService {
 
         // Verifica se já existe uma sala com mesmo nome
         Sala sala = salaRepository.findByNomeSala(nomeSala)
-                .orElse(Sala.builder().nomeSala(nomeSala).build());
+                .orElse(Sala.builder()
+                        .nomeSala(nomeSala).build());
 
-        sala.setCaminhoPlanta(path.toString()); // atualiza o caminho da sala já que o nome vai mudar
+        sala.setCaminhoPlanta(path.toString()); // atualiza o caminho da sala
 
         // Limpa os recursos e cadeiras caso esteja reprocessando a mesma planta
         sala.getLocaisDeTrabalho().clear();
