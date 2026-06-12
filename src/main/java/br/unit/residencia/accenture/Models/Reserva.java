@@ -9,8 +9,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "reservas")
-@Getter
-@Setter
+@Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -26,15 +25,17 @@ public class Reserva {
     @Column(nullable = false)
     private TipoReserva tipoReserva;
 
+    // Esse campo só é preenchido se o tipo de reserva for INDIVIDUAL
     @ManyToOne
     @JoinColumn(name = "id_usuario")
     private Usuario usuario;
 
+    // Esse campo só é preenchido se o tipo de reserva for EQUIPE
     @ManyToOne
     @JoinColumn(name = "id_equipe")
     private Equipe equipe;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "id_sala")
     private Sala sala;
 
@@ -46,4 +47,8 @@ public class Reserva {
 
     @Column(name = "data_hora_criacao")
     private LocalDateTime dataHoraCriacao;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "reserva", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReservaLocal> locais = new ArrayList<>();
 }

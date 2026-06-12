@@ -11,6 +11,9 @@ import java.util.Optional;
 @Repository
 public interface EquipeRepository extends JpaRepository<Equipe, Long> {
 
+    /*
+     * Retorna equipe com seus membros
+     */
     @Query("""
             select distinct e from Equipe e
             left join fetch e.membros

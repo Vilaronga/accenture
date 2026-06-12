@@ -1,23 +1,38 @@
 package br.unit.residencia.accenture.DTOs;
 
+import br.unit.residencia.accenture.Models.Equipe;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * Resposta da sugestão inteligente de alocação de uma equipe.
- *
- * @param idEquipe              id da equipe analisada
- * @param nomeEquipe            nome da equipe
- * @param totalMembros          quantidade de membros considerados
- * @param membros               membros no formato "Nome (ESPECIALIDADE)"
- * @param salaSugeridaProximidade sala com o agrupamento de cadeiras mais compacto (cálculo determinístico)
- * @param sugestaoInteligente   texto gerado pelo Gemini com a alocação por especialidade e proximidade
- */
 public record SugestaoEquipeResponseDTO(
+
+        //remover caso erro
+        @JsonProperty("token")
+        String token,
+
+        @JsonProperty("id_equipe")
         Long idEquipe,
-        String nomeEquipe,
-        int totalMembros,
-        List<String> membros,
-        String salaSugeridaProximidade,
-        String sugestaoInteligente
-) {
-}
+
+        @JsonProperty("idSala")
+        Long idSala,
+
+        @JsonProperty("nomeSala")
+        String nomeSala,
+
+        @JsonProperty("justificativa")
+        String justificativa,
+
+        @JsonProperty("atribuicoes")
+        List<AtribuicaoMembroDTO> atribuicoes,
+
+        @JsonProperty("observacoes")
+        List<String> observacoes,
+
+        @JsonProperty("dataHoraInicio")
+        LocalDateTime dataHoraInicio,
+
+        @JsonProperty("dataHoraFim")
+        LocalDateTime dataHoraFim
+) {}

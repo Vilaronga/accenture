@@ -22,6 +22,11 @@ public class OidcUsuarioService extends OidcUserService {
         this.usuarioRepository = usuarioRepository;
     }
 
+    /*
+     * Verifica a existência no banco do usuário que realizou login.
+     * Caso não possua, ele cria.
+     * Retorna o OidcUser
+     */
     @Override
     public OidcUser loadUser(OidcUserRequest userRequest) {
         OidcUser oidcUser = super.loadUser(userRequest);

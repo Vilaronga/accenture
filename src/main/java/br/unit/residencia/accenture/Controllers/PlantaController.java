@@ -16,6 +16,13 @@ public class PlantaController {
         this.persistenciaService = persistenciaService;
     }
 
+    /*
+    * POST /plantas/processar — Realiza a leitura de uma planta enviada e salva no banco.
+    *
+    * Recebe uma string referente ao nome da sala e um file (planta da sala).
+    *
+    * Retorna uma string avisando se a planta foi salva ou se houve erro.
+    */
     @PostMapping(value = "/processar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> processarPlanta(@RequestParam("nomeSala") String nomeSala, @RequestParam("file") MultipartFile file) {
         try {

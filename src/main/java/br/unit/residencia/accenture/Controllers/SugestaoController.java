@@ -1,12 +1,9 @@
 package br.unit.residencia.accenture.Controllers;
 
-import br.unit.residencia.accenture.DTOs.RequisicaoSugestaoDTO;
-import br.unit.residencia.accenture.DTOs.RespostaSugestaoDTO;
+import br.unit.residencia.accenture.DTOs.SugestaoEquipeRequestDTO;
 import br.unit.residencia.accenture.DTOs.SugestaoEquipeResponseDTO;
-import br.unit.residencia.accenture.Services.GeminiService;
 import br.unit.residencia.accenture.Services.SugestaoService;
-import com.google.genai.types.GenerateContentResponse;
-import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,20 +13,44 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class SugestaoController {
 
-    private final GeminiService cliente;
     private final SugestaoService sugestaoService;
 
-    @Operation(summary = "Teste direto do Gemini com um prompt livre")
-    @PostMapping("/teste")
-    public ResponseEntity<RespostaSugestaoDTO> testarGemini(@RequestBody RequisicaoSugestaoDTO requisicao) {
-        GenerateContentResponse response = cliente.gerarSugestao(requisicao.prompt());
-        return ResponseEntity.ok().body(new RespostaSugestaoDTO(response.text()));
+    /*
+     * POST /sugestoes/equipe — Solicita a sugestão de uma sala para uma equipe
+     *
+     * Recebe o ID da equipe e data da reserva por SugestaoEquipeRequestDTO
+     *
+     * Retorna a sugestão gerada pela API do Gemini. Token + sugestão por SugestaoEquipeResponseDTO
+     */
+    @PostMapping("/equipe")
+    public ResponseEntity<SugestaoEquipeResponseDTO> sugerirParaEquipe(@Valid @RequestBody SugestaoEquipeRequestDTO request) {
+        SugestaoEquipeResponseDTO resposta = sugestaoService.sugerirParaEquipe(request);
+        return ResponseEntity.ok(resposta);
     }
 
-    @Operation(summary = "Sugestão inteligente de alocação de cadeiras para uma equipe, "
-            + "com base nas especialidades dos membros e na proximidade das estações em cada sala")
-    @PostMapping("/equipe/{idEquipe}")
-    public ResponseEntity<SugestaoEquipeResponseDTO> sugerirParaEquipe(@PathVariable Long idEquipe) {
-        return ResponseEntity.ok(sugestaoService.sugerirParaEquipe(idEquipe));
+    /*
+     * POST /sugestoes/aceitar/{token} — Aceita a sugestão gerada pela I.A
+     *
+     * Recebe string Token referente à sugestão que está em cache.
+     *
+     * Retorna string com reserva realizada com sucesso.
+     */
+    @PostMapping("/aceitar/{token}")
+    public ResponseEntity<String> aceitarSugestao(@PathVariable String token) {
+        sugestaoService.aceitarSugestao(token);
+        return ResponseEntity.ok("Reserva realizada com sucesso baseada na sugestão.");
+    }
+
+    /*
+     * DELETE /sugestoes/recusar/{token} — Aceita a sugestão gerada pela I.A
+     *
+     * Recebe string Token referente à sugestão que está em cache.
+     *
+     * Retorna nada. Apenas exclui o token do cache.
+     */
+    @DeleteMapping("/recusar/{token}")
+    public ResponseEntity<Void> recusarSugestao(@PathVariable String token) {
+        sugestaoService.recusarSugestao(token);
+        return ResponseEntity.noContent().build();
     }
 }

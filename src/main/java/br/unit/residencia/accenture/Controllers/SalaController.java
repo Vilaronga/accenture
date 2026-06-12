@@ -16,7 +16,7 @@ public class SalaController {
 
     private final AnalisePlantaBaixaService analiseService;
 
-    // Esse endpoint existe apenas para fazer o teste de upload, o correto para enviar a planta é /plantas/processar
+    // Esse endpoint existe apenas para fazer o teste de upload de plana, o endpoint correto para enviar a planta é /plantas/processar
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResultadoDeteccaoDTO uploadPlanta(@RequestPart("planta") MultipartFile planta) throws Exception {
         return analiseService.analyze(planta);

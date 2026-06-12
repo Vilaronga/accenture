@@ -12,6 +12,9 @@ import java.util.Optional;
 public interface SalaRepository extends JpaRepository<Sala, Long> {
     Optional<Sala> findByNomeSala(String nomeSala);
 
+    /*
+     * Retorna sala com seus locais de trabalho
+     */
     @Query("""
             select distinct s from Sala s
             left join fetch s.locaisDeTrabalho

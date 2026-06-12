@@ -41,10 +41,7 @@ public class AnalisePlantaBaixaService {
             0.78;
 
     // Análise do arquivo recebido
-
-    public ResultadoDeteccaoDTO analyze(
-            MultipartFile multipartFile
-    ) throws Exception {
+    public ResultadoDeteccaoDTO analyze(MultipartFile multipartFile) throws Exception {
 
         File tempFile = createTempFile(multipartFile);
 
@@ -107,8 +104,7 @@ public class AnalisePlantaBaixaService {
     // Resumo de tudo encontrado
     private void printSummary(List<ObjetoDetectadoDTO> objects) {
 
-        long cadeirasGerais =
-                objects.stream().filter(o -> o.type().equals("CADEIRA_GERAL")).count();
+        long cadeirasGerais = objects.stream().filter(o -> o.type().equals("CADEIRA_GERAL")).count();
 
         long cadeirasPc = objects.stream().filter(o -> o.type().equals("CADEIRA_PC")).count();
 
@@ -168,7 +164,6 @@ public class AnalisePlantaBaixaService {
     }
 
     // Verifica os templates das pastas
-
     private void detectTemplatesFromFolder(List<ObjetoDetectadoDTO> objects, Mat image, String folderPath, String type) {
 
         File folder = new File(folderPath);
@@ -210,7 +205,6 @@ public class AnalisePlantaBaixaService {
         Canny(template, template, 50, 150);
 
         // Escalas para verificação
-
         double[] scales = getScalesByType(type);
 
         for (double scale : scales) {
@@ -303,11 +297,7 @@ public class AnalisePlantaBaixaService {
                 );
 
                 // remove comparação
-                removeDetectedArea(
-                        result,
-                        point,
-                        resizedTemplate
-                );
+                removeDetectedArea(result, point, resizedTemplate);
             }
         }
     }
@@ -376,19 +366,9 @@ public class AnalisePlantaBaixaService {
 
         Point maxLoc = new Point();
 
-        minMaxLoc(
-                result,
-                minVal,
-                maxVal,
-                minLoc,
-                maxLoc,
-                null
-        );
+        minMaxLoc(result, minVal, maxVal, minLoc, maxLoc, null);
 
-        return new MatchResult(
-                maxVal.get(),
-                maxLoc
-        );
+        return new MatchResult(maxVal.get(), maxLoc);
     }
 
     // Tenta evitar se já foi detectado
@@ -396,28 +376,9 @@ public class AnalisePlantaBaixaService {
 
         for (ObjetoDetectadoDTO obj : detected) {
 
-            double distance =
-                    Math.sqrt(
+            double distance = Math.sqrt(Math.pow(obj.x() - point.x(), 2) + Math.pow(obj.y() - point.y(), 2));
 
-                            Math.pow(
-                                    obj.x()
-                                            - point.x(),
-                                    2
-                            )
-
-                                    +
-
-                                    Math.pow(
-                                            obj.y()
-                                                    - point.y(),
-                                            2
-                                    )
-                    );
-
-            if (
-                    distance
-                            < DUPLICATE_DISTANCE
-            ) {
+            if (distance < DUPLICATE_DISTANCE) {
                 return true;
             }
         }
