@@ -10,6 +10,8 @@ import br.unit.residencia.accenture.Repositories.ReservaLocalRepository;
 import br.unit.residencia.accenture.Repositories.SalaRepository;
 import br.unit.residencia.accenture.Repositories.UsuarioRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,7 +35,10 @@ public class SugestaoService {
     private final UsuarioRepository usuarioRepository;
     private final ReservaLocalRepository reservaLocalRepository;
 
-    private final Map<String, SugestaoEquipeResponseDTO> cacheTokenSugestao = new ConcurrentHashMap<>();
+    private final Cache<String, SugestaoEquipeResponseDTO> cacheTokenSugestao = Caffeine.newBuilder()
+            .expireAfterWrite(15, TimeUnit.MINUTES)
+            .maximumSize(10_000)
+            .build();
 
     /*
      * Tipos de cadeira para cada especialidade
@@ -161,7 +167,7 @@ public class SugestaoService {
      */
     @Transactional
     public void aceitarSugestao(String token) {
-        SugestaoEquipeResponseDTO sugestao = cacheTokenSugestao.get(token);
+        SugestaoEquipeResponseDTO sugestao = cacheTokenSugestao.getIfPresent(token);
         if (sugestao == null) {
             throw new IllegalArgumentException("Sugestão expirada ou inválida.");
         }
@@ -190,7 +196,7 @@ public class SugestaoService {
 
         // Verifica a lista de conflitos, se houver conflito deleta o token e lança exceção.
         if (!conflitos.isEmpty()) {
-            cacheTokenSugestao.remove(token);
+            cacheTokenSugestao.invalidate(token);
             throw new IllegalStateException(
                     "Não foi possível confirmar a reserva pois os locais " + conflitos +
                             " já foram ocupados. Solicite uma nova sugestão.");
@@ -221,16 +227,17 @@ public class SugestaoService {
             reserva.getLocais().add(reservaLocalRepository.save(reservaLocal));
         }
 
-        cacheTokenSugestao.remove(token);
+        cacheTokenSugestao.invalidate(token);
     }
 
     /*
      * Recusa uma sugestão (Recebe o token)
      */
     public void recusarSugestao(String token) {
-        if (cacheTokenSugestao.remove(token) == null) {
+        if (cacheTokenSugestao.getIfPresent(token) == null) {
             throw new IllegalArgumentException("Sugestão expirada ou inválida.");
         }
+        cacheTokenSugestao.invalidate(token);
     }
 
     /*
