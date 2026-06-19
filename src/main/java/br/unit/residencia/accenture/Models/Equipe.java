@@ -38,7 +38,7 @@ public class Equipe {
     private List<Usuario> membros = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "equipe")
+    @OneToMany(mappedBy = "equipe", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Reserva> reservas = new ArrayList<>();
 
     @Column(name = "data_criacao")
