@@ -174,6 +174,28 @@ public class SugestaoService {
                 .collect(java.util.stream.Collectors.toMap(
                         LocalDeTrabalho::getIdLocalDeTrabalho, l -> l));
 
+        //Verificação de conflito (caso uma reserva seja realizada no meio-termo)
+        List<Long> idsLocaisAReservar = sugestao.atribuicoes().stream()
+                .map(AtribuicaoMembroDTO::idLocalDeTrabalho)
+                .toList();
+
+        //obtém uma lista de lugares atualmente reservados
+        List<Long> ocupados = reservaLocalRepository.findLocaisOcupados(
+                sugestao.idSala(), sugestao.dataHoraInicio(), sugestao.dataHoraFim());
+
+        //Verifica se os locais a serem reservados batem com os ocupados
+        List<Long> conflitos = idsLocaisAReservar.stream()
+                .filter(ocupados::contains)
+                .toList();
+
+        // Verifica a lista de conflitos, se houver conflito deleta o token e lança exceção.
+        if (!conflitos.isEmpty()) {
+            cacheTokenSugestao.remove(token);
+            throw new IllegalStateException(
+                    "Não foi possível confirmar a reserva pois os locais " + conflitos +
+                            " já foram ocupados. Solicite uma nova sugestão.");
+        }
+
         // Uma única reserva para a equipe com todos os locais vinculados
         Reserva reserva = Reserva.builder()
                 .tipoReserva(TipoReserva.EQUIPE)
